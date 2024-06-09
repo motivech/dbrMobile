@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int             @id @default(autoincrement())
+  name           String
+  login          String          @unique
+  password       String
+  level          Int             @default(0)
+  completed_test CompletedTest[]
+
+  @@map("users")
+}
+
+model Test {
+  id              Int             @id @default(autoincrement())
+  name            String
+  description     String
+  subject_id      Int
+  completed_tests CompletedTest[]
+  questions       Question[]
+  subject         Subject         @relation(fields: [subject_id], references: [id])
+
+  @@map("tests")
+}
+
+model CompletedTest {
+  id      Int  @id @default(autoincrement())
+  user_id Int
+  test_id Int
+  test    Test @relation(fields: [test_id], references: [id])
+  user    User @relation(fields: [user_id], references: [id])
+
+  @@map("completed-tests")
+}
+
+model Question {
+  id      Int      @id @default(autoincrement())
+  text    String
+  test_id Int?
+  test    Test?    @relation(fields: [test_id], references: [id])
+
+  right_answer_id Int?
+  answers Answer[]
+
+  @@map("questions")
+}
+
+model Answer {
+  id          Int      @id @default(autoincrement())
+  value       String
+  question_id Int
+  question    Question @relation(fields: [question_id], references: [id])
+
+  @@map("answers")
+}
+
+model Subject {
+  id    Int    @id @default(autoincrement())
+  name  String
+  img   String @default("")
+  tests Test[]
+
+  @@map("subjects")
+}
+

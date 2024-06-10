@@ -1,31 +1,23 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "users" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "login" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "level" INTEGER NOT NULL DEFAULT 0,
 
-  - You are about to drop the `CompletedTest` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Subject` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `subject` table. If the table is not empty, all the data it contains will be lost.
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
 
-*/
--- DropForeignKey
-ALTER TABLE "CompletedTest" DROP CONSTRAINT "CompletedTest_test_id_fkey";
+-- CreateTable
+CREATE TABLE "tests" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "subject_id" INTEGER NOT NULL,
 
--- DropForeignKey
-ALTER TABLE "CompletedTest" DROP CONSTRAINT "CompletedTest_user_id_fkey";
-
--- DropForeignKey
-ALTER TABLE "subject" DROP CONSTRAINT "subject_question_id_fkey";
-
--- DropForeignKey
-ALTER TABLE "tests" DROP CONSTRAINT "tests_subject_id_fkey";
-
--- DropTable
-DROP TABLE "CompletedTest";
-
--- DropTable
-DROP TABLE "Subject";
-
--- DropTable
-DROP TABLE "subject";
+    CONSTRAINT "tests_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "completed-tests" (
@@ -34,6 +26,16 @@ CREATE TABLE "completed-tests" (
     "test_id" INTEGER NOT NULL,
 
     CONSTRAINT "completed-tests_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "questions" (
+    "id" SERIAL NOT NULL,
+    "text" TEXT NOT NULL,
+    "test_id" INTEGER,
+    "right_answer_id" INTEGER,
+
+    CONSTRAINT "questions_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -54,6 +56,9 @@ CREATE TABLE "subjects" (
     CONSTRAINT "subjects_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateIndex
+CREATE UNIQUE INDEX "users_login_key" ON "users"("login");
+
 -- AddForeignKey
 ALTER TABLE "tests" ADD CONSTRAINT "tests_subject_id_fkey" FOREIGN KEY ("subject_id") REFERENCES "subjects"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -62,6 +67,9 @@ ALTER TABLE "completed-tests" ADD CONSTRAINT "completed-tests_test_id_fkey" FORE
 
 -- AddForeignKey
 ALTER TABLE "completed-tests" ADD CONSTRAINT "completed-tests_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "questions" ADD CONSTRAINT "questions_test_id_fkey" FOREIGN KEY ("test_id") REFERENCES "tests"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "answers" ADD CONSTRAINT "answers_question_id_fkey" FOREIGN KEY ("question_id") REFERENCES "questions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

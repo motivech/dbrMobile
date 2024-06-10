@@ -1,29 +1,45 @@
-import {StyleSheet, Text, View} from "react-native";
+import {Button, StyleSheet, Text, View} from "react-native";
 import {QuestionType} from "@/app/(tabs)/tests/[test]";
 import RadioGroup from "react-native-radio-buttons-group";
 import {useState} from "react";
 
-
-export const TestExample = (props: QuestionType) => {
+type TestExampleProps = {
+    question: QuestionType;
+    onSelect: (answerId: number) => void
+}
+export const TestExample = (props: TestExampleProps) => {
 
     const [selectId, setSelectId] = useState('')
-
 
     return(
         <View>
             <View style={style.cardContainer}>
                 <Text>
-                    {props.text}
+                    {props.question.text}
                 </Text>
             </View>
             <View style={{alignItems:'flex-start'}}>
-                <RadioGroup radioButtons={props.answers.map((answer) => ({
-                    id: answer.id.toString(),
-                    value: answer.value,
-                    label: answer.value,
-                }))} onPress={setSelectId} selectedId={selectId}/>
+                <RadioGroup
+                    radioButtons={props.question.answers.map((answer) => ({
+                        id: answer.id.toString(),
+                        value: answer.value,
+                        label: answer.value,
+                    }))}
+                    onPress={(selectedButton) => {
+                        console.log(selectedButton)
+                        const answer = props.question.answers.map((answer) => ({
+                            id: answer.id.toString(),
+                            value: answer.value,
+                            label: answer.value,
+                        })).find(el => +el.id === +selectedButton)!
+                        props.onSelect(+answer.id)
+                        setSelectId(selectedButton);
+                    }}
+                    selectedId={selectId}
+                />
             </View>
         </View>
+
     )
 }
 

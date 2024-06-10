@@ -31,23 +31,24 @@ model Test {
 }
 
 model CompletedTest {
-  id      Int  @id @default(autoincrement())
-  user_id Int
-  test_id Int
-  test    Test @relation(fields: [test_id], references: [id])
-  user    User @relation(fields: [user_id], references: [id])
+  id           Int  @id @default(autoincrement())
+  user_id      Int
+  test_id      Int
+  test         Test @relation(fields: [test_id], references: [id])
+  user         User @relation(fields: [user_id], references: [id])
+  rightAnswers Int  @default(0)
 
   @@map("completed-tests")
 }
 
 model Question {
-  id      Int      @id @default(autoincrement())
+  id      Int    @id @default(autoincrement())
   text    String
   test_id Int?
-  test    Test?    @relation(fields: [test_id], references: [id])
+  test    Test?  @relation(fields: [test_id], references: [id])
 
   right_answer_id Int?
-  answers Answer[]
+  answers         Answer[]
 
   @@map("questions")
 }
@@ -69,4 +70,3 @@ model Subject {
 
   @@map("subjects")
 }
-

@@ -53,7 +53,7 @@ export class TestService {
         })
     }
 
-    async checkTest({test_id, answers}: {test_id: number, answers: {question_id: number, answer_id: number}[]}) {
+    async checkTest({test_id, answers, user_id}: {user_id: number, test_id: number, answers: {question_id: number, answer_id: number}[]}) {
 
         console.log(answers)
 
@@ -66,6 +66,7 @@ export class TestService {
                    select: {
                        id: true,
                        right_answer_id: true,
+                       text: true,
                        answers: true,
                    }
                }
@@ -82,9 +83,17 @@ export class TestService {
 
             if(userAnswer.answer_id === question.right_answer_id) rightAnswers++;
             else {
-                errorQuestionsId.push(userAnswer.question_id)
+                // @ts-ignore
+                errorQuestionsId.push(question)
             }
         }
+        await this.prismaService.completedTest.create({
+            data: {
+                test_id: test_id,
+                user_id: user_id,
+                rightAnswers: rightAnswers
+            }
+        })
 
         return {
             totalScore: (rightAnswers / questions.length) * 100,
@@ -97,6 +106,23 @@ export class TestService {
         return this.prismaService.test.create({
             data: test
         })
+    }
+    getCompleted(user_id:number){
+        return this.prismaService.completedTest.findMany(
+            {where:{user_id},
+            select: {
+                id: true,
+                rightAnswers:true,
+                test:{
+                    select:{
+                        id:true,
+                        questions:true,
+                        name:true,
+                        subject:true
+                    }
+                }
+            }}
+        )
     }
 
 }
